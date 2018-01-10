@@ -1,0 +1,220 @@
+<div class="control-tool">
+    <button class="layui-btn layui-btn-sm" onclick="openCreateUserBox()">新建用户</button>
+</div>
+<div class="control-search">
+    <div class="control-search-item">
+        <label>用户ID:</label>
+        <input id="user_searchUserId" type="text" placeholder="请输入用户ID" autocomplete="off">
+    </div>
+    <div class="control-search-item">
+        <label>用户名:</label>
+        <input id="user_searchUsername" type="text" placeholder="请输入用户名" autocomplete="off">
+    </div>
+    <div class="control-search-item">
+        <label>姓名:</label>
+        <input id="user_searchName" type="text" placeholder="请输入姓名" autocomplete="off">
+    </div>
+    <div class="control-search-item">
+        <button class="layui-btn layui-btn-sm" onclick="readUser()">查询</button>
+    </div>
+</div>
+
+<table id="user_table" lay-filter="user_tableFilter"></table>
+
+<script id="user_table_toolBar" type="text/html">
+    <a class="layui-btn layui-btn-sm" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-sm" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del">删除</a>
+</script>
+<script id="user_detailBox" type="text/html">
+    <form class="layui-form" lay-filter="userBoxFilter" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">输入框</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" required lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码框</label>
+            <div class="layui-input-inline">
+                <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">辅助文字</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">选择框</label>
+            <div class="layui-input-block">
+                <select name="city" lay-verify="required">
+                    <option value=""></option>
+                    <option value="0">北京</option>
+                    <option value="1">上海</option>
+                    <option value="2">广州</option>
+                    <option value="3">深圳</option>
+                    <option value="4">杭州</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">复选框</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="like[write]" title="写作">
+                <input type="checkbox" name="like[read]" title="阅读" checked>
+                <input type="checkbox" name="like[dai]" title="发呆">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">开关</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="switch" lay-skin="switch">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">单选框</label>
+            <div class="layui-input-block">
+                <input type="radio" name="sex" value="男" title="男">
+                <input type="radio" name="sex" value="女" title="女" checked>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">文本域</label>
+            <div class="layui-input-block">
+                <textarea name="desc" placeholder="请输入内容" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</script>
+<script id="user_createUserBox" type="text/html">
+    <form class="layui-form" lay-filter="createUserBoxFilter">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="username" required lay-verify="required" placeholder="请输入唯一的用户名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">姓名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="name" required lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="createUserBoxFormFilter">立即提交</button>
+            </div>
+        </div>
+    </form>
+</script>
+<script>
+    var table = layui.table;
+    table.render({
+        elem: '#userTable',
+        even: true,
+        url: '/api/user/readUser',
+        request: {
+            pageName: 'pageNumber',
+            limitName: 'pageSize'
+        },
+        response: {
+            statusName: 'code',
+            statusCode: 0,
+            msgName: 'message',
+            countName: 'total',
+            dataName: 'data'
+        },
+        page: {
+            theme: '#c00'
+        },
+        cols: [[
+            {field: 'userId', title: 'ID', width: 50},
+            {field: 'createTime', title: '创建时间', width: 165},
+            {field: 'updateTime', title: '更新时间', width: 165},
+            {field: 'username', title: '用户名', width: 100},
+            {field: 'name', title: '姓名', width: 100},
+            {field: 'description', title: '描述'},
+            {toolbar: '#userTableToolBar'}
+        ]]
+    });
+
+    function readUser() {
+        table.reload('user_table', {
+            where: {
+                userId: $('#user_searchUserId').val(),
+                username: $('#user_searchUsername').val(),
+                name: $('#user_searchName').val()
+            },
+            page: {
+                curr: 1
+            }
+        });
+    }
+
+    table.on('tool(user_tableFilter)', function (object) {
+        var data = object.data; //获得当前行数据
+        var layEvent = object.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+        var tr = object.tr; //获得当前行 tr 的DOM对象
+        //查看
+        if (layEvent === 'detail') {
+            var index = layui.layer.open({
+                type: 1,
+                move: false,
+                offset: '50px',
+                title: '查看用户详情',
+                content: $("#userBox").html(),
+                area: '80%'
+            });
+            layui.form.render(null, 'userBoxFilter');
+        } else if (layEvent === 'del') {
+            layer.confirm('确定删除用户:' + data.username, {
+                title: '',
+                btnAlign: 'c',
+                closeBtn: 0,
+                move: false
+            }, function (index) {
+                object.del();
+                layer.close(index);
+                //向服务端发送删除指令
+            });
+        } else if (layEvent === 'edit') { //编辑
+            //do something
+
+            //同步更新缓存对应的值
+            object.update({
+                username: '123'
+                , title: 'xxx'
+            });
+        }
+    });
+
+    var createUserLayerIndex;
+
+    /**
+     * 打开新建用户框
+     */
+    function openCreateUserBox() {
+        createUserLayerIndex = layui.layer.open({
+            type: 1,
+            move: false,
+            title: '创建新用户',
+            content: $("#createUserBox").html(),
+            area: ['450px', '250px']
+        });
+        layui.form.render(null, 'createUserBoxFilter');
+    }
+
+    //创建用户
+    layui.form.on('submit(createUserFormFilter)', function (data) {
+        $.post('/api/user/createUser', {username: data.field.username, name: data.field.name}, function (result) {
+            layer.msg(result.message);
+            if (result.code === 0) {
+                layui.layer.close(createUserLayerIndex);
+            }
+        });
+        return false;
+    });
+</script>

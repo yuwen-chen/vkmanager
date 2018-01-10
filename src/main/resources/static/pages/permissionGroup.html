@@ -1,0 +1,87 @@
+<div class="control-tool">
+    <button class="layui-btn layui-btn-sm">新建权限组</button>
+</div>
+<div class="control-search">
+    <div class="control-search-item">
+        <label>权限组ID:</label>
+        <input type="text" id="readPermissionGroupId" placeholder="请输入权限组ID" autocomplete="off">
+    </div>
+    <div class="control-search-item">
+        <button class="layui-btn layui-btn-sm" onclick="readPermissionGroup()">查询</button>
+    </div>
+</div>
+
+<table id="permissionGroupTable" lay-filter="permissionGroupTableFilter"></table>
+
+<script type="text/html" id="permissionGroupTableToolBar">
+    <a class="layui-btn layui-btn-sm" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-sm" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del">删除</a>
+</script>
+
+<script>
+    var table = layui.table;
+    table.render({
+        elem: '#permissionGroupTable',
+        even: true,
+        url: '/api/permissionGroup/readPermissionGroup',
+        request: {
+            pageName: 'pageNumber',
+            limitName: 'pageSize'
+        },
+        response: {
+            statusName: 'code',
+            statusCode: 0,
+            msgName: 'message',
+            countName: 'total',
+            dataName: 'data'
+        },
+        page: {
+            theme: '#c00'
+        },
+        cols: [[
+            {field: 'permissionGroupId', title: 'ID', width: 70},
+            {field: 'createTime', title: '创建时间', width: 170},
+            {field: 'updateTime', title: '更新时间', width: 170},
+            {field: 'permissionGroupName', title: '权限组名', width: 200},
+            {field: 'description', title: '描述'},
+            {toolbar: '#permissionGroupTableToolBar'}
+        ]]
+    });
+
+    function readPermissionGroup() {
+        table.reload('permissionGroupTable', {
+            where: {
+                permissionGroupId: $('#readPermissionGroupId').val()
+            },
+            page: {
+                curr: 1
+            }
+        });
+    }
+
+    //监听工具条
+    table.on('tool(permissionGroupTableFilter)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+        var data = obj.data; //获得当前行数据
+        var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+        var tr = obj.tr; //获得当前行 tr 的DOM对象
+
+        if (layEvent === 'detail') { //查看
+            //do somehing
+        } else if (layEvent === 'del') { //删除
+            layer.confirm('真的删除行么', function (index) {
+                obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                layer.close(index);
+                //向服务端发送删除指令
+            });
+        } else if (layEvent === 'edit') { //编辑
+            //do something
+
+            //同步更新缓存对应的值
+            obj.update({
+                username: '123'
+                , title: 'xxx'
+            });
+        }
+    });
+</script>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <context id="mysqlTable" targetRuntime="MyBatis3">
+        <property name="javaFileEncoding" value="UTF-8"/>
+
+        <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.MapperAnnotationPlugin"/>
+        <plugin type="com.vikde.vkmanager.mybatis.generator.CustomPlugin"/>
+        <plugin type="org.mybatis.generator.plugins.RenameExampleClassPlugin">
+            <property name="searchString" value="Example$"/>
+            <property name="replaceString" value="Criteria"/>
+        </plugin>
+
+        <commentGenerator type="com.vikde.vkmanager.mybatis.generator.CustomCommentGenerator">
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/vkmanager?characterEncoding=utf8"
+                        userId="root"
+                        password="123456">
+        </jdbcConnection>
+
+
+        <javaModelGenerator targetPackage="com.vikde.vkmanager.repository.model" targetProject="src\main\java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <javaClientGenerator type="ANNOTATEDMAPPER" targetPackage="com.vikde.vkmanager.repository.mapper" targetProject="src\main\java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <table tableName="user" domainObjectName="User" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
+               enableCountByExample="false">
+            <property name="useActualColumnNames" value="true"/>
+            <generatedKey column="userId" sqlStatement="mysql" identity="true"/>
+        </table>
+        <table tableName="role" domainObjectName="Role" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"
+               enableCountByExample="false">
+            <property name="useActualColumnNames" value="true"/>
+            <generatedKey column="roleId" sqlStatement="mysql" identity="true"/>
+        </table>
+        <table tableName="permission_group" domainObjectName="PermissionGroup" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false" enableCountByExample="false">
+            <property name="useActualColumnNames" value="true"/>
+            <generatedKey column="permissionGroupId" sqlStatement="mysql" identity="true"/>
+        </table>
+        <table tableName="permission" domainObjectName="Permission" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false" enableCountByExample="false">
+            <property name="useActualColumnNames" value="true"/>
+            <generatedKey column="permissionId" sqlStatement="mysql" identity="true"/>
+        </table>
+    </context>
+</generatorConfiguration>
