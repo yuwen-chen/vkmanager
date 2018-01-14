@@ -86,6 +86,9 @@ public class UserService {
         if (user.getIsDeleted()) {
             throw new ApiException(JsonResultType.USER_IS_DELETED);
         }
+        if (user.getUserStatusType() == UserStatusType.INACTIVE.getIndex()) {
+            throw new ApiException(JsonResultType.USER_NOT_ACTIVE);
+        }
         //记录登陆数据
         extUserMapper.login(user.getUserId(), new Date());
         user.setLoginTime(new Date());

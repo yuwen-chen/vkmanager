@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>管理系统</title>
     <link rel="stylesheet" href="assets/components/layui/css/layui.css">
-    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="assets/css/index.css">
 </head>
 
 <body>
@@ -87,36 +87,6 @@
 </div>
 <div class="layui-side-shadow" onclick="sideShadowHide()"></div>
 
-<script id="loginBox" type="text/html">
-    <form class="layui-form" lay-filter="loginBoxFilter">
-        <div class="layui-form-item">
-            <label class="layui-form-label">用户名</label>
-            <div class="layui-input-inline">
-                <input id="loginUsername" type="text" name="username" required lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">密码</label>
-            <div class="layui-input-inline">
-                <input id="loginPassword" type="password" name="password" required lay-verify="required" placeholder="请输入8-30位密码" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">记住密码</label>
-            <div class="layui-input-block">
-                <!--suppress HtmlFormInputWithoutLabel -->
-                <input type="checkbox" name="switch" checked lay-skin="switch"/>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label"></label>
-            <div class="layui-input-inline">
-                <button class="layui-btn" lay-submit lay-filter="loginBoxFormFilter">登录</button>
-            </div>
-            <div class="layui-form-mid layui-word-aux"></div>
-        </div>
-    </form>
-</script>
 <script id="changePasswordBox" type="text/html">
     <form class="layui-form" lay-filter="changePasswordBoxFilter">
         <div class="layui-form-item">
@@ -153,11 +123,132 @@
 </script>
 <script src="/assets/js/jquery-2.2.3.min.js "></script>
 <script src="/assets/components/layui/layui.all.js"></script>
-<script src="/assets/js/jquery.cookie.js"></script>
-<script src="/assets/js/vconsole.min.js"></script>
-<script>
-    var vConsole = new VConsole();
+<script type="application/javascript">
+    $(document).ready(function () {
+        readOwn();
+    });
+
+    //获取用户信息
+    function readOwn() {
+        $.post('/api/user/readOwn', function (result) {
+            if (result.code === 0) {
+                //显示用户信息
+                $('#userName').html(result.data.name);
+
+                //首页多一些逻辑判断
+                var pathname = window.location.pathname;
+                if ("/" === pathname || "/index.html" === pathname) {
+                    $('*[permission-control]').addClass('layui-hide');
+                    $.each(result.data.permissionList, function (i, item) {
+                        $("*[permission-control='" + item.path + "']").removeClass('layui-hide');
+                    });
+                    var menuList = $('.layui-side .layui-nav-child');
+                    menuList.parent().addClass('layui-hide');
+                    menuList.each(function () {
+                        if ($(this).children('dd').not('.layui-hide').length > 0) {
+                            $(this).parent().removeClass('layui-hide');
+                        }
+                    });
+                    //设置用户信息
+                    $('#userCreateTime').html(result.data.createTime);
+                    $('#userLoginTime').html(result.data.loginTime);
+                    $('#userPreLoginTime').html(result.data.preLoginTime);
+                    $('#userUsername').html(result.data.username);
+                    $('#userLoginCount').html(result.data.loginCount);
+                }
+            } else {
+                location.replace("login.html");
+            }
+        });
+    }
+
+
+    var changePasswordLayerIndex;
+
+    /**
+     * 打开修改密码框
+     */
+    function openChangePasswordBox() {
+        changePasswordLayerIndex = layui.layer.open({
+            type: 1,
+            move: false,
+            shade: [0.95, '#000'],
+            title: '修改密码',
+            content: $('#changePasswordBox').html(),
+            area: ['450px', '350px']
+        });
+    }
+
+    /**
+     * 修改密码
+     */
+    layui.form.on('submit(changePasswordBoxFormFilter)', function (data) {
+        $.post('/api/user/changePassword', {
+            username: data.field.username,
+            password: data.field.password,
+            firstPassword: data.field.firstPassword,
+            secondPassword: data.field.secondPassword
+        }, function (result) {
+            layui.layer.msg(result.message);
+            if (result.code === 0) {
+                layui.layer.close(changePasswordLayerIndex);
+                readOwn();
+            }
+        });
+        return false;
+    });
+
+    //切换或者增加一个新的tab
+    function changeTab(tabId, title, url) {
+        var element = layui.element;
+        sideShadowHide();
+        var tab = $(".layui-tab-title li[lay-id=" + tabId + "]");
+        if (tab == null || tab.length === 0) {
+            var data = "<iframe style='border: 0;width: 100%;height: 100%' src='" + url + "'></iframe>";
+            element.tabAdd('tabs', {
+                title: title,
+                content: data,
+                id: tabId
+            });
+            element.tabChange('tabs', tabId);
+            // $.get(url, function (data) {
+            //
+            // });
+        } else {
+            element.tabChange('tabs', tabId);
+        }
+    }
+
+    /**
+     * 退出登录
+     */
+    function logout() {
+        layer.confirm('确定退出登录吗?', {
+            title: '',
+            btnAlign: 'c',
+            closeBtn: 0,
+            move: false,
+            shade: [0.95, '#000']
+        }, function (index) {
+            $.post('/api/user/logout', function (result) {
+                layer.msg(result.message);
+                if (result.code === 0) {
+                    location.replace("login.html");
+                }
+            });
+        });
+    }
+
+    function sideMore() {
+        $('.layui-side-shadow').addClass('layui-side-shadow-show');
+        $(".layui-side").addClass('layui-side-show');
+    }
+
+    //隐藏
+    function sideShadowHide() {
+        $('.layui-side-shadow').removeClass('layui-side-shadow-show');
+        $(".layui-side").removeClass('layui-side-show');
+    }
 </script>
-<script src="/assets/js/global.js"></script>
 </body>
 </html>
